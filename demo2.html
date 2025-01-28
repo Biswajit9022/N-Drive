@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>My Drive Main Page</title>
+    <link rel="stylesheet" href="assets/css/bootstrap-icons.css" />
+    <link rel="stylesheet" href="assets/css/styles.css" />
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700;800;900&display=swap");
+
+      body {
+        font-family: "Poppins", sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f9;
+        color: #333;
+      }
+
+      .header {
+        display: flex;
+        align-items: center;
+        background-color: #007bff;
+        color: #fff;
+        padding: 10px 20px;
+      }
+
+      .header img {
+        height: 50px;
+        margin-right: 20px;
+      }
+
+      .header h1 {
+        flex: 1;
+        font-size: 24px;
+        letter-spacing: 2px;
+        margin: 0;
+      }
+
+      .header .user-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .header .user-info img {
+        height: 40px;
+        border-radius: 50%;
+      }
+
+      .sidebar {
+        background-color: #fff;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        width: 250px;
+        height: calc(100vh - 60px);
+        position: fixed;
+        top: 60px;
+        left: 0;
+        overflow-y: auto;
+      }
+
+      .sidebar h2 {
+        font-size: 18px;
+        margin-bottom: 20px;
+        color: #007bff;
+      }
+
+      .sidebar button {
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        padding: 10px 15px;
+        cursor: pointer;
+        width: 100%;
+        margin-bottom: 20px;
+      }
+
+      .sidebar button:hover {
+        background-color: #0056b3;
+      }
+
+      .sidebar .nav-item {
+        display: flex;
+        align-items: center;
+        padding: 10px 0;
+        cursor: pointer;
+        color: #333;
+        font-size: 16px;
+      }
+
+      .sidebar .nav-item i {
+        font-size: 20px;
+        margin-right: 15px;
+      }
+
+      .sidebar .nav-item:hover {
+        background-color: #f0f0f0;
+        border-radius: 4px;
+      }
+
+      .main-content {
+        margin-left: 270px;
+        padding: 20px;
+      }
+
+      .main-content h2 {
+        font-size: 22px;
+        margin-bottom: 20px;
+      }
+
+      .main-content .breadcrumbs {
+        margin-bottom: 20px;
+        padding: 10px;
+        background-color: #fff;
+        border-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .main-content .breadcrumbs span {
+        cursor: pointer;
+        color: #007bff;
+      }
+
+      .main-content .file-details {
+        background-color: #fff;
+        border-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        padding: 15px;
+      }
+
+      .main-content .file-details h3 {
+        margin-bottom: 15px;
+      }
+
+      .main-content .file-details table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .main-content .file-details th,
+      .main-content .file-details td {
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+      }
+
+      .main-content .file-details th {
+        text-align: left;
+      }
+
+      .file-upload {
+        background-color: #007bff;
+        color: #fff;
+        padding: 20px;
+        border-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      .file-upload:hover {
+        background-color: #0056b3;
+      }
+
+      .file-upload input {
+        display: none;
+      }
+
+      .file-upload i {
+        font-size: 40px;
+      }
+
+      .modal,
+      .prompt-box {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.4);
+        justify-content: center;
+        align-items: center;
+      }
+
+      .modal-content,
+      .prompt-box {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        width: 90%;
+        max-width: 400px;
+        text-align: center;
+      }
+
+      .modal-content .close,
+      .prompt-box .close {
+        color: #aaa;
+        float: right;
+        font-size: 24px;
+        font-weight: bold;
+      }
+
+      .modal-content .close:hover,
+      .prompt-box .close:hover {
+        color: #333;
+        cursor: pointer;
+      }
+
+      .modal-content input,
+      .prompt-box input {
+        width: calc(100% - 22px);
+        padding: 10px;
+        margin: 10px 0;
+        box-sizing: border-box;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+
+      .modal-content button,
+      .prompt-box button {
+        background-color: #007bff;
+        color: #fff;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      .modal-content button:hover,
+      .prompt-box button:hover {
+        background-color: #0056b3;
+      }
+
+      .modal-content .form-group {
+        margin-bottom: 15px;
+      }
+
+      .file-info,
+      .share-file,
+      .new-folder {
+        background-color: #fff;
+        border-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        padding: 15px;
+        margin-bottom: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <img src="assets/images/cloud.png" alt="Cloud Icon" />
+      <h1>N DRIVE</h1>
+      <div class="user-info">
+        <img src="assets/images/user.png" alt="User Avatar" />
+        <div>Hi <span class="username">User</span></div>
+        <a href="#" onclick="table.logout()" style="color: #fff">[logout]</a>
+      </div>
+    </div>
+
+    <div class="sidebar">
+      <button onclick="action.show_new_folder()">+ New Folder</button>
+      <div
+        class="nav-item"
+        id="MY DRIVE"
+        onclick="mode.set(this.id);table.change_folder_by_id(0)"
+      >
+        <i class="bi bi-cloud-arrow-up-fill"></i>
+        My Drive
+      </div>
+      <div class="nav-item" id="FAVORITES" onclick="mode.set(this.id)">
+        <i class="bi bi-star-fill"></i>
+        Favorites
+      </div>
+      <div class="nav-item" id="RECENT" onclick="mode.set(this.id)">
+        <i class="bi bi-alarm-fill"></i>
+        Recent
+      </div>
+      <div class="nav-item" id="TRASH" onclick="mode.set(this.id)">
+        <i class="bi bi-trash3-fill"></i>
+        Trash
+      </div>
+    </div>
+
+    <div class="main-content">
+      <div class="breadcrumbs">
+        <span onclick="table.change_folder_by_id(0)">My Drive</span>
+      </div>
+      <h2>MY DRIVE</h2>
+      <div
+        class="file-upload"
+        onclick="document.querySelector('.file-upload input').click()"
+      >
+        <i class="bi bi-cloud-arrow-up-fill"></i>
+        Drag and drop files here or click to upload (less than 50mb)
+        <input type="file" onchange="upload.send(this.files)" multiple />
+      </div>
+      <div class="file-info">
+        <div class="file-details">
+          <h3>File Details</h3>
+          <table>
+            <tbody>
+              <tr>
+                <th>Name:</th>
+                <td id="filename">example.txt</td>
+              </tr>
+              <tr>
+                <th>Type:</th>
+                <td id="filetype">Text Document</td>
+              </tr>
+              <tr>
+                <th>Size:</th>
+                <td id="filesize">15 KB</td>
+              </tr>
+              <tr>
+                <th>Date Created:</th>
+                <td id="filedate">2024-07-11</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="share-file">
+        <h3>Share File</h3>
+        <button onclick="table.show_share_modal()">Share</button>
+      </div>
+    </div>
+
+    <div id="fileUploadModal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="modal.hide('fileUploadModal')"
+          >&times;</span
+        >
+        <h2>Upload File</h2>
+        <input type="file" onchange="upload.send(this.files)" />
+        <button onclick="modal.hide('fileUploadModal')">Upload</button>
+      </div>
+    </div>
+
+    <div id="shareFileModal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="modal.hide('shareFileModal')"
+          >&times;</span
+        >
+        <h2>Share File</h2>
+        <form id="shareForm">
+          <div class="form-group">
+            <input type="text" placeholder="Email or Username" required />
+          </div>
+          <button type="submit">Share</button>
+        </form>
+      </div>
+    </div>
+
+    <div id="newFolderModal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="modal.hide('newFolderModal')"
+          >&times;</span
+        >
+        <h2>Create New Folder</h2>
+        <form id="newFolderForm">
+          <div class="form-group">
+            <input type="text" placeholder="Folder Name" required />
+          </div>
+          <button type="submit">Create Folder</button>
+        </form>
+      </div>
+    </div>
+
+    <script src="assets/js/main.js"></script>
+    <script>
+      const action = {
+        show_new_folder: () => modal.show("newFolderModal"),
+        // Additional actions
+      };
+
+      const modal = {
+        show: (id) => (document.getElementById(id).style.display = "flex"),
+        hide: (id) => (document.getElementById(id).style.display = "none"),
+      };
+
+      const upload = {
+        send: (files) => {
+          // Handle file upload
+        },
+      };
+
+      // Example function for changing folder view
+      const table = {
+        change_folder_by_id: (id) => {
+          console.log(`Change to folder with id: ${id}`);
+          // Logic to change folder view
+        },
+        logout: () => {
+          console.log("Logout");
+          // Logout logic
+        },
+        show_share_modal: () => modal.show("shareFileModal"),
+      };
+
+      // Example function for mode changes
+      const mode = {
+        set: (id) => {
+          console.log(`Set mode to: ${id}`);
+          // Logic to change mode
+        },
+      };
+    </script>
+  </body>
+</html>

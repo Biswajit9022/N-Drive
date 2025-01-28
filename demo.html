@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Drive</title>
+    <style>
+      /* Reset and global styles */
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        color: #333;
+        background-color: #f9f9f9;
+        overflow-x: hidden;
+      }
+
+      /* Header */
+      .header {
+        background: #333;
+        color: #fff;
+        padding: 10px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 1000;
+      }
+
+      .header-content {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .header-title {
+        font-size: 24px;
+        flex: 1;
+        text-align: center;
+      }
+
+      .menu-toggle {
+        background: #444;
+        border: none;
+        color: #fff;
+        font-size: 24px;
+        padding: 10px;
+        cursor: pointer;
+      }
+
+      .header-right {
+        display: flex;
+        align-items: center;
+      }
+
+      .drive-space {
+        margin-right: 20px;
+        font-size: 14px;
+      }
+
+      .js-drive-space-text {
+        display: block;
+      }
+
+      .js-drive-space-percent {
+        background: #555;
+        height: 5px;
+        width: 0;
+        transition: width 0.3s;
+      }
+
+      .logout-button {
+        background: #f44336;
+        border: none;
+        color: #fff;
+        padding: 10px 20px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+
+      .logout-button:hover {
+        background: #c62828;
+      }
+
+      /* Sidebar */
+      .sidebar {
+        background: #f4f4f4;
+        padding: 10px;
+        width: 250px;
+        height: 100vh;
+        position: fixed;
+        top: 0;
+        left: 0;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s;
+      }
+
+      .sidebar.hide {
+        transform: translateX(-100%);
+      }
+
+      .user-info {
+        margin-bottom: 20px;
+        text-align: center;
+      }
+
+      .username {
+        font-size: 16px;
+        font-weight: bold;
+      }
+
+      .sidebar-menu ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      .menu-item {
+        padding: 10px;
+        cursor: pointer;
+        position: relative;
+      }
+
+      .menu-item:hover,
+      .menu-item.active {
+        background: #ddd;
+      }
+
+      /* Submenu */
+      .submenu {
+        display: none;
+        padding-left: 20px;
+        background: #eaeaea;
+      }
+
+      .submenu .submenu-item {
+        padding: 8px 0;
+      }
+
+      .menu-item.active .submenu {
+        display: block;
+      }
+
+      /* Main Content */
+      .main-content {
+        margin-left: 250px;
+        padding: 70px 20px 20px;
+        background: #fff;
+      }
+
+      .breadcrumbs {
+        margin-bottom: 20px;
+        font-size: 14px;
+        color: #555;
+      }
+
+      .file-actions {
+        margin-bottom: 20px;
+      }
+
+      .file-actions button {
+        background: #007bff;
+        color: #fff;
+        border: none;
+        padding: 10px 15px;
+        margin-right: 10px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+
+      .file-actions button:hover {
+        background: #0056b3;
+      }
+
+      .file-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .file-table th,
+      .file-table td {
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+        text-align: left;
+      }
+
+      .file-table th {
+        background: #f4f4f4;
+      }
+
+      .file-table tbody tr:hover {
+        background: #f1f1f1;
+      }
+
+      /* Modal */
+      .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: none;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .modal-content {
+        background: #fff;
+        padding: 20px;
+        border-radius: 5px;
+        max-width: 500px;
+        width: 100%;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      }
+
+      .modal-content h2 {
+        margin-bottom: 15px;
+      }
+
+      .modal-content input {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+      }
+
+      .modal-content button {
+        background: #007bff;
+        color: #fff;
+        border: none;
+        padding: 10px 15px;
+        margin-right: 10px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+
+      .modal-content button:hover {
+        background: #0056b3;
+      }
+
+      /* Drag and Drop Styles */
+      .drop-zone {
+        border: 2px dashed #007bff;
+        padding: 20px;
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      .drop-zone.dragover {
+        background: #e3f2fd;
+        border-color: #0288d1;
+      }
+    </style>
+  </head>
+
+  <body>
+    <header class="header">
+      <div class="header-content">
+        <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+        <h1 class="header-title">My Drive</h1>
+        <div class="header-right">
+          <div class="drive-space">
+            <span class="js-drive-space-text">0GB / 0GB</span>
+            <div class="js-drive-space-percent"></div>
+          </div>
+          <button class="logout-button" onclick="logout()">Logout</button>
+        </div>
+      </div>
+    </header>
+    <aside class="sidebar">
+      <div class="user-info">
+        <span class="username">User Name</span>
+      </div>
+      <nav class="sidebar-menu">
+        <ul>
+          <li
+            id="MY DRIVE"
+            class="menu-item active"
+            onclick="setMode('MY DRIVE')"
+          >
+            My Drive
+            <div class="submenu">
+              <div class="submenu-item" onclick="setMode('Documents')">
+                Documents
+              </div>
+              <div class="submenu-item" onclick="setMode('Images')">Images</div>
+              <div class="submenu-item" onclick="setMode('Videos')">Videos</div>
+            </div>
+          </li>
+          <li id="FAVORITES" class="menu-item" onclick="setMode('FAVORITES')">
+            Favorites
+          </li>
+          <li id="TRASH" class="menu-item" onclick="setMode('TRASH')">Trash</li>
+        </ul>
+      </nav>
+    </aside>
+    <main class="main-content">
+      <div class="breadcrumbs" id="breadcrumbs"></div>
+      <div class="file-actions">
+        <button class="new-folder-button" onclick="showNewFolderPrompt()">
+          New Folder
+        </button>
+        <button class="upload-button" onclick="upload()">Upload</button>
+        <button class="refresh-button" onclick="refresh()">Refresh</button>
+      </div>
+      <div
+        class="drop-zone"
+        id="drop-zone"
+        ondrop="handleDrop(event)"
+        ondragover="handleDragOver(event)"
+      >
+        Drag and drop files here
+      </div>
+      <table class="file-table" id="file-table">
+        <thead>
+          <tr>
+            <th>Icon</th>
+            <th>Name</th>
+            <th>Favorite</th>
+            <th>Type</th>
+            <th>Share Mode</th>
+            <th>Date Updated</th>
+            <th>Size</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="table-body">
+          <!-- Table rows will be inserted here by JavaScript -->
+        </tbody>
+      </table>
+    </main>
+
+    <!-- Modals -->
+    <div class="modal" id="renamePrompt">
+      <div class="modal-content">
+        <h2>Rename File or Folder</h2>
+        <input type="text" id="newName" placeholder="New name" />
+        <button onclick="submitRename()">Submit</button>
+        <button onclick="closeRenamePrompt()">Cancel</button>
+      </div>
+    </div>
+
+    <div class="modal" id="movePrompt">
+      <div class="modal-content">
+        <h2>Move File or Folder</h2>
+        <input type="text" id="moveFileName" placeholder="File/Folder Name" />
+        <input type="text" id="moveDestination" placeholder="Destination" />
+        <button onclick="moveFile()">Move</button>
+        <button onclick="closeMovePrompt()">Cancel</button>
+      </div>
+    </div>
+
+    <div class="modal" id="newFolderPrompt">
+      <div class="modal-content">
+        <h2>Create New Folder</h2>
+        <input type="text" id="folderName" placeholder="Folder Name" />
+        <button onclick="createFolder()">Create</button>
+        <button onclick="closeNewFolderPrompt()">Cancel</button>
+      </div>
+    </div>
+
+    <script>
+      // Toggle Sidebar
+      function toggleSidebar() {
+        document.querySelector(".sidebar").classList.toggle("hide");
+      }
+
+      // Set Mode (change content or behavior based on the selected mode)
+      function setMode(newMode) {
+        console.log(`Mode set to ${newMode}`);
+        // Add logic to change the view based on the mode
+      }
+
+      // Show New Folder Prompt
+      function showNewFolderPrompt() {
+        document.getElementById("newFolderPrompt").style.display = "flex";
+      }
+
+      // Close New Folder Prompt
+      function closeNewFolderPrompt() {
+        document.getElementById("newFolderPrompt").style.display = "none";
+      }
+
+      // Create New Folder
+      function createFolder() {
+        const folderName = document.getElementById("folderName").value;
+        // Implement folder creation functionality
+        console.log("Creating folder:", folderName);
+        closeNewFolderPrompt();
+      }
+
+      // Upload Files
+      function upload() {
+        console.log("Uploading files...");
+        // Implement file upload functionality
+      }
+
+      // Refresh Files
+      function refresh() {
+        console.log("Refreshing files...");
+        // Implement refresh functionality
+      }
+
+      // Handle Drag Over Event
+      function handleDragOver(event) {
+        event.preventDefault();
+        document.getElementById("drop-zone").classList.add("dragover");
+      }
+
+      // Handle Drop Event
+      function handleDrop(event) {
+        event.preventDefault();
+        document.getElementById("drop-zone").classList.remove("dragover");
+        // Handle file drop event
+        const files = event.dataTransfer.files;
+        console.log("Dropped files:", files);
+      }
+
+      // Show Rename Prompt
+      function showRenamePrompt() {
+        document.getElementById("renamePrompt").style.display = "flex";
+      }
+
+      // Close Rename Prompt
+      function closeRenamePrompt() {
+        document.getElementById("renamePrompt").style.display = "none";
+      }
+
+      // Submit Rename
+      function submitRename() {
+        const newName = document.getElementById("newName").value;
+        // Implement rename functionality
+        console.log("Renaming to:", newName);
+        closeRenamePrompt();
+      }
+
+      // Show Move Prompt
+      function showMovePrompt() {
+        document.getElementById("movePrompt").style.display = "flex";
+      }
+
+      // Close Move Prompt
+      function closeMovePrompt() {
+        document.getElementById("movePrompt").style.display = "none";
+      }
+
+      // Move File
+      function moveFile() {
+        const fileName = document.getElementById("moveFileName").value;
+        const destination = document.getElementById("moveDestination").value;
+        // Implement move functionality
+        console.log(`Moving ${fileName} to ${destination}`);
+        closeMovePrompt();
+      }
+
+      // Logout Functionality
+      function logout() {
+        console.log("Logging out...");
+        // Implement logout functionality
+      }
+
+      // Mock objects for demonstration
+      const table = {
+        logout: () => console.log("Logging out..."),
+        refresh: () => console.log("Refreshing..."),
+      };
+
+      const mode = {
+        set: (newMode) => console.log(`Mode set to ${newMode}`),
+      };
+
+      const action = {
+        show_new_folder: () => console.log("Showing new folder prompt..."),
+      };
+    </script>
+  </body>
+</html>
